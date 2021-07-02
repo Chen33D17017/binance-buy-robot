@@ -1,5 +1,5 @@
 # Buying Robot on Binance
-This is a simple personal regularly buying crypto currency robot on Binance
+This is a simple personal robot for buying crypto currency on Binance
 
 ## Dependency
 Install following dependency(python3):
