@@ -10,8 +10,8 @@ def main(args):
     config = {
         "secret_file": args[0],
         "asset": args[1],
-        "target": args[3],
-        "amount": float(args[2])
+        "target": args[2],
+        "amount": float(args[3])
     }
 
     secret = read_secret(config['secret_file'])
