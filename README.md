@@ -15,7 +15,7 @@ simplely execute following command
 python main.py <secret file> <from_asset> <target> <amount>
 ```
 
-secret file need to be yaml file and content:
+secret file need to be yaml file and contain:
 
 ```yaml
 apiKey:
