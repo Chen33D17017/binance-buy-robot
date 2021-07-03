@@ -11,7 +11,7 @@ docker build . -t binance-bot
 docker run --rm --name binance-bot -v <path-to-config.yml>:/app/config.yml binance-bot python main.py config.yml <secret file> <from_asset> <target> <amount>
 
 # e.g.:
-docker run --rm --name binance-bot -v ~/binance-bot/config.yml:/app/config.yml binance-bot python main.py config.yml BUSD KSM 10
+docker run --rm --name binance-bot -v ~/projects/binance-buy-robot/config.yml:/app/config.yml binance-bot python main.py config.yml BUSD KSM 10
 ```
 
 
