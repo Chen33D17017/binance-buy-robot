@@ -14,6 +14,8 @@ def main(args):
         "amount": float(args[3])
     }
 
+    print("config:", config)
+
     secret = read_secret(config['secret_file'])
     trader = Trader(secret)
     trader.redeem_and_trade(
