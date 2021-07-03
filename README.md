@@ -14,6 +14,13 @@ docker run --rm --name binance-bot -v <path-to-config.yml>:/app/config.yml binan
 docker run --rm --name binance-bot -v ~/projects/binance-buy-robot/config.yml:/app/config.yml binance-bot python main.py config.yml BUSD KSM 10
 ```
 
+## Run script periodically (using crontab)
+
+``` sh
+crontab -e
+# Then add the following line into the file, this example runs at 8:00am everyday
+0 8 * * * docker run --rm --name binance-bot -v ~/binance-buy-robot/config.yml:/app/config.yml binance-bot python main.py config.yml BUSD KSM 10 >> ~/projects/binance-buy-robot/log.txt
+```
 
 ## Dependency
 Install following dependency(python3):
