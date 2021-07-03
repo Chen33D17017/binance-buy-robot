@@ -17,7 +17,7 @@ def main(args):
     secret = read_secret(config['secret_file'])
     trader = Trader(secret)
     trader.redeem_and_trade(
-        config['aseet'],
+        config['asset'],
         config['target'],
         config['amount'])
 
