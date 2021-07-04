@@ -45,6 +45,8 @@ python main.py config.yml BUSD KSM 10
 secret file need to be yaml file and contain:
 
 ```yaml
+uid:
+webhook:
 apiKey:
 apiSecret: 
 ```

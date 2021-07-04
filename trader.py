@@ -1,6 +1,8 @@
 from common import read_secret
 from binance.spot import Spot 
+import json
 import time
+import requests
 
 
 class Trader():
@@ -14,15 +16,24 @@ class Trader():
             self.client = Spot(
                 config['apiKey'],
                 config['apiSecret'])
+        if 'uid' in config and 'webhook' in config:
+            self.call_webhook = True
+            self.uid = config['uid']
+            self.webhook = config['webhook']
 
     def get_all_flexible_product_positions(self, asset="BUSD"):
         flexible_positions = \
             self.client.savings_flexible_product_position(asset=asset)
-        flexible_positions = sorted(flexible_positions, key=lambda x: x['avgAnnualInterestRate'])
+        flexible_positions = \
+            sorted(
+                flexible_positions,
+                key=lambda x: x['avgAnnualInterestRate']
+            )
         return flexible_positions
 
     def check_flexible_product(self, asset="BUSD", amount=10):
-        flexible_positions = self.get_all_flexible_product_positions(asset=asset)
+        flexible_positions = \
+            self.get_all_flexible_product_positions(asset=asset)
         for position in flexible_positions:
             if float(position['totalAmount']) >= amount:
                 return position['productId']
@@ -53,8 +64,35 @@ class Trader():
         self.redeem_balance(asset, amount)
         # not sure redeem is async or not
         time.sleep(1)
-        self.make_trade(symbol=f"{target}{asset}", amount=amount)
+        res = self.make_trade(symbol=f"{target}{asset}", amount=amount)
+        if self.call_webhook:
+            self.call_webhook(self.uid, res)
     
+    def call_webhook(self, uid, response, precision=6):
+        payload = self.generate_webhook_content(
+            uid,
+            response,
+            precision
+        )
+        data = json.dumps(payload)
+        headers = {'Content-Type': 'application/json'}
+        requests.request("POST", self.webhook, headers=headers, data=data)
+
+    def generate_webhook_content(self, uid, response, precision=6):
+        fills = response['fills']
+        cost, qty = 0, 0
+        for fill in fills:
+            cost += float(fill['price']) * float(fill['qty']) \
+                + float(fill['commission'])
+            qty += float(fill['qty'])
+
+        return {
+            "uid": uid,
+            "symbol": response['symbol'],
+            "average_cost": round(cost / qty, precision),
+            "qty": round(qty, precision)
+        }
+
     @classmethod
     def round_quantity(cls, quantity, precision=6):
         return float(round(quantity, precision))
@@ -103,8 +141,16 @@ def test_trade():
     amount = trader.round_quantity(amount)
     res = trader.make_trade(symbol=symbol, amount=amount, is_test=is_test)
     print(res)
+    print(trader.process_trade_response(res))
+
+
+def test_integration():
+    config = read_secret()
+    trader = Trader(config=config)
+    trader.redeem_and_trade("BUSD", "DOT", 10)
 
 
 if __name__ == '__main__':
-    test_get_flexible_positions()
+    # test_get_flexible_positions()
     # test_trade()
+    test_integration()
