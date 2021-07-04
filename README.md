@@ -50,3 +50,14 @@ webhook:
 apiKey:
 apiSecret: 
 ```
+
+## Calling Webhook
+If you assign webhook & uid in your config file, robot will call your webhook with POST request
+payload example:
+
+```json
+    "uid": uid,
+    "symbol": 'KSMBUSD',
+    "average_cost": 15.872,
+    "qty": 1
+```
