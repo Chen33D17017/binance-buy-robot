@@ -66,19 +66,20 @@ class Trader():
         time.sleep(1)
         res = self.make_trade(symbol=f"{target}{asset}", amount=amount)
         if self.call_webhook:
-            self.call_webhook(self.uid, res)
+            self.call_webhook(self.uid, res, "buy")
     
-    def call_webhook(self, uid, response, precision=6):
+    def call_webhook(self, uid, response, action, precision=6):
         payload = self.generate_webhook_content(
             uid,
             response,
+            action,
             precision
         )
         data = json.dumps(payload)
         headers = {'Content-Type': 'application/json'}
         requests.request("POST", self.webhook, headers=headers, data=data)
 
-    def generate_webhook_content(self, uid, response, precision=6):
+    def generate_webhook_content(self, uid, response, action, precision=6):
         fills = response['fills']
         cost, qty = 0, 0
         for fill in fills:
@@ -89,6 +90,7 @@ class Trader():
         return {
             "uid": uid,
             "symbol": response['symbol'],
+            "action": action,
             "average_cost": round(cost / qty, precision),
             "qty": round(qty, precision)
         }

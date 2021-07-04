@@ -59,6 +59,7 @@ payload example:
 {
     "uid": "uid",
     "symbol": "KSMBUSD",
+    "action": "buy",
     "average_cost": 15.872,
     "qty": 1
 }
