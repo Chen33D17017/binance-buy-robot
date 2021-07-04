@@ -66,20 +66,18 @@ class Trader():
         time.sleep(1)
         res = self.make_trade(symbol=f"{target}{asset}", amount=amount)
         if self.call_webhook:
-            self.call_webhook(self.uid, res, "buy")
-    
-    def call_webhook(self, uid, response, action, precision=6):
-        payload = self.generate_webhook_content(
-            uid,
-            response,
-            action,
-            precision
-        )
+            payload = self.generate_webhook_content(
+                res,
+                "buy",
+            )
+            self.post_webhook(payload)
+
+    def post_webhook(self, payload):
         data = json.dumps(payload)
         headers = {'Content-Type': 'application/json'}
         requests.request("POST", self.webhook, headers=headers, data=data)
 
-    def generate_webhook_content(self, uid, response, action, precision=6):
+    def generate_webhook_content(self, response, action, precision=6):
         fills = response['fills']
         cost, qty = 0, 0
         for fill in fills:
@@ -88,11 +86,20 @@ class Trader():
             qty += float(fill['qty'])
 
         return {
-            "uid": uid,
+            "uid": self.uid,
             "symbol": response['symbol'],
             "action": action,
             "average_cost": round(cost / qty, precision),
             "qty": round(qty, precision)
+        }
+
+    def operate_webhook_content(self, symbol, action, average_cost, qty):
+        return {
+            "uid": self.uid,
+            "symbol": symbol,
+            "action": action,
+            "average_cost": average_cost,
+            "qty": qty
         }
 
     @classmethod
@@ -146,13 +153,14 @@ def test_trade():
     print(trader.process_trade_response(res))
 
 
-def test_integration():
+def test_integration(symbol):
     config = read_secret()
     trader = Trader(config=config)
-    trader.redeem_and_trade("BUSD", "DOT", 10)
+    payload = trader.operate_webhook_content("SOLBUSD", "buy", 34.392, 0.29)
+    trader.post_webhook(payload)
 
 
 if __name__ == '__main__':
     # test_get_flexible_positions()
     # test_trade()
-    test_integration()
+    test_integration("SOLBUSD")
