@@ -56,8 +56,10 @@ If you assign webhook & uid in your config file, robot will call your webhook wi
 payload example:
 
 ```json
-    "uid": uid,
-    "symbol": 'KSMBUSD',
+{
+    "uid": "uid",
+    "symbol": "KSMBUSD",
     "average_cost": 15.872,
     "qty": 1
+}
 ```
